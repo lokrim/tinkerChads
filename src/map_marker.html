@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Map with Markers</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  </head>
+  <body>
+    <div id="map" style="height: 1200px; width: 100%;"></div>
+    <!-- <button id="getDataButton">Get Data</button> Add a button -->
+    <script>
+      const map = L.map("map").setView([10.8505, 76.2711], 8); // Center on Kerala
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+
+      // Add markers for each location
+
+      // Function to make GET request and handle response
+      function Get() {
+        fetch('http://localhost:3000/send-json', {
+          method: 'GET',
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          //console.log('Server response:', data);
+          // Show popup with received data
+          //alert(`Received data: ${JSON.stringify(data)}`);
+          for(let i = 4; i >= 0;i--){
+            let marker = L.marker([data[i].xcord, data[i].ycord]).addTo(map).bindPopup("Location "+ i);
+          }
+    
+        })
+        .catch(error => {
+          console.error('Error receiving data from server:', error);
+          alert('Error receiving data from server');
+        });
+      }
+
+
+      // Add event listener to the button
+      const getDataButton = document.getElementById('getDataButton');
+      Get();
+      getDataButton.addEventListener('click', Get);
+    </script>
+  </body>
+</html>
